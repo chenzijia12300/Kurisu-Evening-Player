@@ -1,0 +1,4 @@
+tools/.connection-code
+tools/.logs/
+__pycache__/
+*.pyc

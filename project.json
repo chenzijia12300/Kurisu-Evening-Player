@@ -1,0 +1,138 @@
+{
+  "title": "暮色共听 · 牧濑红莉栖 | Evening Music Player",
+  "description": "暮色共听：牧濑红莉栖、窗外流云与轻微人物动态。Now Playing同步系统歌曲、歌手、专辑、播放状态和可用时间，联网匹配LRCLIB歌词及高清封面；无时间或无匹配时自动降级。基础媒体显示无需辅助程序；播放按钮与酷狗补充时间可选本机控制器。布局适配4K；底图1672×941。",
+  "type": "web",
+  "file": "index.html",
+  "preview": "preview.png",
+  "contentrating": "Everyone",
+  "tags": [
+    "Anime",
+    "Relaxing"
+  ],
+  "general": {
+    "supportsaudioprocessing": true,
+    "properties": {
+      "widgets": {
+        "order": 0,
+        "text": "显示播放器",
+        "type": "bool",
+        "value": true
+      },
+      "showclock": {
+        "order": 1,
+        "text": "显示时钟",
+        "type": "bool",
+        "value": true
+      },
+      "spectrum": {
+        "order": 2,
+        "text": "显示音乐频谱",
+        "type": "bool",
+        "value": true
+      },
+      "brightness": {
+        "order": 3,
+        "text": "背景亮度",
+        "type": "slider",
+        "value": 100,
+        "min": 60,
+        "max": 120
+      },
+      "bridgetoken": {
+        "order": 4,
+        "text": "本机播放控制连接码（可选）",
+        "type": "textinput",
+        "value": ""
+      },
+      "hairmotion": {
+        "order": 5,
+        "text": "发梢与中段发丝微风",
+        "type": "bool",
+        "value": true
+      },
+      "windstrength": {
+        "order": 6,
+        "text": "微风强度",
+        "type": "slider",
+        "value": 55,
+        "min": 0,
+        "max": 100
+      },
+      "breathing": {
+        "order": 7,
+        "text": "轻微呼吸与衣袖随动",
+        "type": "bool",
+        "value": true
+      },
+      "blinking": {
+        "order": 8,
+        "text": "偶尔眨眼",
+        "type": "bool",
+        "value": true
+      },
+      "eyemotion": {
+        "order": 9,
+        "text": "细微视线变化",
+        "type": "bool",
+        "value": true
+      },
+      "citylights": {
+        "order": 10,
+        "text": "城市灯光缓慢明暗",
+        "type": "bool",
+        "value": true
+      },
+      "reflections": {
+        "order": 11,
+        "text": "桌面微弱灯光倒影",
+        "type": "bool",
+        "value": true
+      },
+      "parallax": {
+        "order": 12,
+        "text": "鼠标平移取景（露出边缘画面）",
+        "type": "bool",
+        "value": true
+      },
+      "windowclouds": {
+        "order": 13,
+        "text": "窗外局部云朵向右飘动",
+        "type": "bool",
+        "value": true
+      },
+      "onlinemetadata": {
+        "order": 14,
+        "text": "联网查询歌词与高清封面",
+        "type": "bool",
+        "value": true
+      },
+      "showlyrics": {
+        "order": 15,
+        "text": "显示歌词",
+        "type": "bool",
+        "value": true
+      },
+      "hdcover": {
+        "order": 16,
+        "text": "优先高清专辑封面",
+        "type": "bool",
+        "value": true
+      },
+      "lyricoffset": {
+        "order": 17,
+        "text": "歌词时间偏移（秒，正值提前）",
+        "type": "slider",
+        "value": 0,
+        "min": -5,
+        "max": 5,
+        "precision": 1
+      },
+      "mediadebug": {
+        "order": 18,
+        "text": "媒体调试日志",
+        "type": "bool",
+        "value": false
+      }
+    }
+  }
+}

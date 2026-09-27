@@ -1,0 +1,5 @@
+Tool: built-in image_gen (edit mode).
+Edit target: assets/kurisu-resting.png
+Output: assets/kurisu-eyes-closed.png
+
+Use case: precise-object-edit. Edit target: the supplied Makise Kurisu wallpaper. Create the CLOSED-EYE animation frame of exactly this original artwork. Change ONLY the two eyes from open to gently and naturally completely closed, with delicate dark upper eyelashes and skin-toned closed eyelids. Follow each original eye's exact tilt and original eye corners; the eyelids meet at the lower eye edge naturally. Maintain the same face identity, angle, eyelid shading and original high quality illustration rendering. ABSOLUTELY preserve the original canvas composition, framing, head position and scale, every red hair strand, skin color, body, white lab coat, hands, window, sky, city and desk exactly. No smile changes. No other changes or additions. Do not crop, zoom, move or redraw other areas. Landscape 1672x941 or same 16:9 proportions. This will be overlaid onto the original image only within the eye regions for a brief blink, so exact alignment and unchanged surrounding skin matter most. No UI, no text, no watermark.

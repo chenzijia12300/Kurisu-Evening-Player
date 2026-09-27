@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>暮色共听 · 牧濑红莉栖</title>
+  <link rel="stylesheet" href="style.css?v=18">
+</head>
+<body>
+  <div class="scene-depth" aria-hidden="true">
+    <div class="scene"></div>
+    <canvas id="hair-scene" hidden></canvas>
+  </div>
+  <div class="shade" aria-hidden="true"></div>
+  <main class="widgets">
+    <section class="player glass" aria-label="音乐播放器">
+      <header><span class="eyebrow">EVENING SESSION</span><span id="status" class="status">等待音乐</span></header>
+      <div class="artwork"><img id="cover" src="assets/kurisu-resting.png" alt="歌曲封面占位图"><img id="cover-hd" class="album" alt="高清专辑封面" referrerpolicy="no-referrer"><div class="art-shade"></div><span class="art-caption" id="art-caption">此刻，与你共听</span></div>
+      <div class="track"><h1 id="title">等一首歌</h1><p id="artist">播放音乐，让黄昏有声音</p><p id="album" hidden></p></div>
+      <section id="lyrics" aria-label="歌词" hidden><p id="lyric-current"><span class="lyric-main"></span><span class="lyric-sub"></span></p><p id="lyric-next"></p><small id="lyric-source"></small></section>
+      <div class="timeline"><div id="progress" role="progressbar" aria-label="歌曲进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="progress-fill"></i></div><div class="times"><span id="elapsed">--:--</span><span id="duration">--:--</span></div></div>
+      <div class="controls">
+        <button id="volume-down" class="small" aria-label="降低系统音量" title="降低系统音量" disabled><svg viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path class="line" d="M16 12h5"/></svg></button>
+        <button id="previous" aria-label="上一首" title="上一首" disabled><svg viewBox="0 0 24 24"><path d="M5 5h3v14H5zM19 5 9 12l10 7z"/></svg></button>
+        <button id="toggle" class="primary" aria-label="播放或暂停" title="播放或暂停" disabled><svg id="play-icon" viewBox="0 0 24 24"><path d="m9 5 11 7-11 7z"/></svg><svg id="pause-icon" viewBox="0 0 24 24" hidden><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg></button>
+        <button id="next" aria-label="下一首" title="下一首" disabled><svg viewBox="0 0 24 24"><path d="M16 5h3v14h-3zM5 5l10 7-10 7z"/></svg></button>
+        <button id="volume-up" class="small" aria-label="提高系统音量" title="提高系统音量" disabled><svg viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path class="line" d="M18 8v8m-4-4h8"/></svg></button>
+      </div>
+      <canvas id="spectrum" aria-label="实时音乐频谱"></canvas>
+      <button class="connection" id="connection">连接播放控制 <span>↗</span></button>
+    </section>
+    <section class="clock glass" aria-label="本地时间"><div class="clock-top"><span>余晖未尽</span><button id="settings" aria-label="播放器设置" title="播放器设置">···</button></div><div class="clock-row"><time id="clock">00:00</time><span id="seconds">00</span></div><p id="date"></p></section>
+  </main>
+  <dialog id="settings-dialog">
+    <form id="settings-form"><div class="dialog-heading"><h2>播放控制</h2><button type="button" id="close-settings" aria-label="关闭">×</button></div>
+      <p id="connection-description">封面、歌名由支持 Windows 媒体会话的音乐软件提供。本机控制器可选，用于播放控制及酷狗时间补充。联网增强会向 LRCLIB、MusicBrainz 查询歌名、歌手和专辑，可在壁纸属性中关闭。</p>
+      <div id="host-instructions" hidden><p>桌面壁纸不接收键盘输入，请在 Wallpaper Engine 主窗口中填写：</p><ol><li>选中「暮色共听 · 牧濑红莉栖」壁纸。</li><li>在右侧壁纸属性找到「本机播放控制连接码（可选）」。</li><li>粘贴控制器显示的连接码，点击「确定」或「应用」。</li></ol><p class="hint">不是在桌面上的这个弹窗中输入。要长期断开，请清空壁纸属性中的连接码。</p></div>
+      <div id="browser-connection"><label for="token">本机控制器连接码</label><input id="token" type="password" autocomplete="off" spellcheck="false" placeholder="粘贴控制器显示的连接码"></div>
+      <p class="hint" id="controller-hint">控制器：tools/start-controller.cmd。它只在本机运行；歌名和封面能否显示，取决于音乐软件是否提供系统媒体信息。</p>
+      <div class="dialog-actions"><button type="button" id="disconnect">断开</button><button type="button" id="retry-connect" hidden>重新检查连接</button><button type="submit" id="submit-connect">连接</button></div><p id="connect-result" role="status"></p>
+    </form>
+  </dialog>
+  <div id="toast" role="status" hidden></div>
+  <script src="media-state.js?v=18"></script>
+  <script src="src/utils/chinese.js?v=18"></script>
+  <script src="src/utils/track.js?v=18"></script>
+  <script src="src/media/MediaState.js?v=18"></script>
+  <script src="src/media/WallpaperMediaProvider.js?v=18"></script>
+  <script src="src/utils/network.js?v=18"></script>
+  <script src="src/services/MediaCache.js?v=18"></script>
+  <script src="src/services/lyrics/lrcParser.js?v=18"></script>
+  <script src="src/services/lyrics/ttmlParser.js?v=18"></script>
+  <script src="src/services/lyrics/LyricsProvider.js?v=18"></script>
+  <script src="src/services/lyrics/LrclibProvider.js?v=18"></script>
+  <script src="src/services/lyrics/KugouLyricsProvider.js?v=18"></script>
+  <script src="src/services/lyrics/AmllLyricsProvider.js?v=18"></script>
+  <script src="src/services/artwork/ArtworkProvider.js?v=18"></script>
+  <script src="src/services/artwork/MusicBrainzArtworkProvider.js?v=18"></script>
+  <script src="src/media/MediaEnrichment.js?v=18"></script>
+  <script src="src/components/NowPlaying/NowPlaying.js?v=18"></script>
+  <script src="hair-motion.js?v=18"></script>
+  <script src="wallpaper.js?v=18"></script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+# Now Playing 技术说明
+
+保留原生 HTML/CSS/JavaScript，无 npm、TypeScript 编译或运行时框架要求。所有脚本随壁纸打包，在 body 底部按依赖顺序同步载入，以兼容 Wallpaper Engine 本地文件环境。背景渲染保持 v9。
+
+## 模块边界
+
+- `src/media/WallpaperMediaProvider.js`：唯一的官方媒体监听入口，提供 subscribe/notify/setTimeline。立即注册五个监听器，关闭媒体集成时清空状态。
+- `src/media/MediaState.js`：扩展现有 TrackState；统一标题、歌手、专辑、专辑歌手、播放状态、时间、系统/高清封面、歌词、当前行。原生有效时间优先，可选控制器读取中断七秒后停止推算，保留最近位置和总时长，恢复后校准。
+- `src/media/MediaEnrichment.js`：400ms 元数据合并，按歌曲、时长及属性产生查询版本，取消旧请求，分路并行请求歌词与封面。构造器可注入 lyricsProviders / artworkProviders 数组和 cache。
+- `src/components/NowPlaying/NowPlaying.js`：只消费统一状态，负责元数据、封面渐变、进度、歌词；不访问 Wallpaper Engine 媒体 API。
+- `src/services/lyrics/`：Provider 契约、AMLL/TTML 与 LRCLIB/LRC 查询解析。支持多时间戳、小数精度、文件 offset、同一时间翻译合并、空白间奏行、二分定位。
+- `src/services/artwork/`：Provider 契约与 MusicBrainz / Cover Art Archive；匹配 recording 和专辑，优先 release，缺图再尝试 release-group。
+- `src/services/MediaCache.js`：版本化 localStorage 缓存，失效/容量/条数控制，无法持久化时自动使用内存。
+- `src/utils/`：规范化、匹配评分、超时与分服务请求队列。
+- `wallpaper.js`：原有频谱、时钟、连接设置和可选本机控制功能的装配入口；后续可把已有 loopback 连接逻辑单独迁移为 LocalBridgeProvider。
+
+## 使用与降级
+
+不运行本机控制器也能读取播放器通过 Windows 媒体会话提供的字段，联网查询歌词与高清封面。播放/暂停/切歌按钮和酷狗缺失时间的补充读取仍需要可选控制器。
+
+属性：联网查询歌词与高清封面、显示歌词、优先高清专辑封面、歌词偏移 -5 至 +5 秒（正值提前）、媒体调试日志。关闭联网会取消正在进行的请求并恢复系统封面。预览使用原创演示文字，不会把示例歌名发往外部服务。
+
+有可靠播放位置与多行有效 LRC 才自动高亮。只有普通歌词、只有一个时间戳、或者没有可靠时间时，显示可用的歌词行，不伪造播放位置。不匹配、空白歌词或纯音乐时隐藏歌词区域。LRCLIB 收录不保证完整：2026-09-26 实测《泪海》只能取得普通歌词。
+
+系统缩略图、歌曲信息、播放状态各自独立到达；切歌清除旧封面和歌词。官方 thumbnail 事件没有曲目 ID，无法给一个任意迟到的宿主封面事件做绝对可靠的歌曲归属；网络查询与图片预加载则使用版本隔离，拒绝旧歌覆盖。
+
+## 网络与缓存
+
+外部查询只使用歌名、歌手、专辑和可用时长，不发送控制器连接码。请求 credentials=omit，10秒超时；图片预加载12秒超时，300ms 淡入。CAA 的旧 HTTP 图片链接升级为 HTTPS，封面仅允许 archive.org / coverartarchive.org 域。
+
+MusicBrainz 请求间隔至少1.2秒，LRCLIB/CAA 间隔至少400ms；支持 navigator.locks 时跨同源页面协同，并保留本地队列降级。尊重429/503的 Retry-After，最多60秒冷却。浏览器的 User-Agent 由宿主管理，未尝试绕过浏览器限制。分发规模增大时应根据 MusicBrainz 对应用识别和共享IP限流的要求重新评估服务接入。
+
+缓存只含歌词文字、来源/ID、匹配元数据、封面 URL、时间戳，不存大图片 Base64。歌词30天、封面匹配7天、确定无匹配5分钟；网络错误不缓存为无结果。最多100条且序列化文本不超过750000字符；过期和最久未使用条目先淘汰。缺失字段补全后可以重新评分，不把 duration=0 传给外部查询。
+
+## 验证与已知范围
+
+已通过状态/Provider/LRC/缓存/旧响应隔离单元验证；浏览器覆盖同步歌词、偏移、拖动进度事件、暂停、无时间、高清封面渐变、断网、属性开关、文本注入防护、控制器回归，以及16:9、21:9、32:9和窄屏布局。
+
+真实浏览器联网验证已取得 LRCLIB 歌词结果、MusicBrainz recording / release-group 匹配和1200×1188封面图片；本地 file:// 页面可加载歌词 JSON 与图片。这些不等于所有网络环境、所有歌曲、所有音乐客户端版本都能成功，也不代替 Wallpaper Engine 宿主最终显示的实测。
+
+官方资料：
+- https://docs.wallpaperengine.io/en/web/audio/media.html
+- https://lrclib.net/docs
+- https://musicbrainz.org/doc/MusicBrainz_API
+- https://musicbrainz.org/doc/Cover_Art_Archive/API
+
+检查脚本位于项目外的 `Kurisu-Evening-Player-QA`，不随壁纸打包。
+
+## 运行入口
+
+完整部署、自启和连接码操作见 [运行说明](docs/RUNNING.md)。自启使用当前用户启动文件夹快捷方式，显式运行安装脚本后才启用；不会自动启动音乐播放器。启动器检测端口与连接码，后台模式日志写入 tools/.logs。

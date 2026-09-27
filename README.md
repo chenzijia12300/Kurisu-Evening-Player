@@ -10,7 +10,6 @@ Wallpaper Engine 网页壁纸：夕阳场景、局部人物与云层动画、音
 4. 从**这次启动的控制器所在 tools 目录**读取 `.connection-code`，粘贴到 **Wallpaper Engine 主窗口 → 当前壁纸右侧属性 → 本机播放控制连接码（可选）**。连接码通常只配一次。
 5. 希望以后自动运行控制器，双击 [tools/install-autostart.cmd](tools/install-autostart.cmd)。安装后在当前用户下次登录 Windows 时后台启动；当前会话需要时可双击 [tools/start-controller-background.cmd](tools/start-controller-background.cmd)。
 
-推荐固定使用 `G:\ai-video\Kurisu-Evening-Player\tools` 作为你这台电脑的控制器目录。不要轮流从旧解压包、开发目录和 Wallpaper Engine 导入副本启动。首次安装到其他电脑时，请使用其实际目录。
 
 **创建这些脚本不会自动启用自启。** 必须自己运行安装脚本。Wallpaper Engine 本身的自动启动需在它的设置中另行开启。控制器也不会替你打开酷狗或开始播放音乐。
 

@@ -17,6 +17,14 @@
       /\bradio edit\b|\bedit\b|剪辑版|剪輯版/.test(text)?'edit':''
     ]).sort();
   };
+  const isTranslatedTitle=(main,annotation)=>{
+    // Different scripts identify a possible display translation, not an arbitrary subtitle.
+    const text=annotation.trim();
+    if(!text||/\d|\b(?:part|pt|vol|volume|chapter|version|ver|live|remix|edit|feat|ft)\b|第|章|篇|部|版|现场|現場|伴奏|翻唱/i.test(text))return false;
+    const script=value=>/[\p{Script=Hiragana}\p{Script=Katakana}]/u.test(value)?'kana':/\p{Script=Han}/u.test(value)?'han':/\p{Script=Latin}/u.test(value)?'latin':'';
+    const a=script(main),b=script(text);
+    return !!a&&!!b&&a!==b;
+  };
   const titleInfo=value=>{
     let base=String(value||'').normalize('NFKC').trim();
     const features=[];
@@ -27,6 +35,9 @@
     const metadata=/\blive\b|\bremix\b|\bacoustic\b|\binstrumental\b|\bkaraoke\b|\bcover\b|\b(?:re)?master(?:ed)?\b|\bradio edit\b|\bversion\b|现场|現場|伴奏|翻唱|不插电|不插電|重制|重製|修复|修復|版本|音质|音質/i;
     base=base.replace(/[([]([^\])]+)[\])]/g,(all,inside)=>metadata.test(inside)?'':all);
     base=base.replace(/\s+[-–—]\s+(.+)$/, (all,suffix)=>metadata.test(suffix)?'':all).trim();
+    // Music clients append translations such as ヒッチコック (希区柯克).
+    // Apply symmetrically to the local title and LRCLIB candidates.
+    base=base.replace(/\s*[([]([^\])]+)[\])]\s*$/, (all,inside,offset)=>isTranslatedTitle(base.slice(0,offset),inside)?'':all).trim();
     return {base:base||String(value||''),features:unique(features),versions:versionTags(value)};
   };
   const artistScore=(wanted,actual)=>{

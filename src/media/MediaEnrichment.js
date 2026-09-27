@@ -26,7 +26,7 @@
         }
         // Album/duration refinement is a new query, not a new song. Keep usable results visible.
         const bridge=kind==='lyrics'&&typeof N.bridgeReady==='function'&&N.bridgeReady()?1:0;
-        const key='stable-v2:'+kind+':'+N.trackKey(track)+':'+Math.round(track.duration||0)+':'+bridge;
+        const key=(kind==='lyrics'?'lyrics-v3:':'stable-v2:')+kind+':'+N.trackKey(track)+':'+Math.round(track.duration||0)+':'+bridge;
         if(this.jobs[kind]?.key===key)continue;
         this.cancel(kind);
         const job=this.jobs[kind]={key,control:new AbortController(),attempt:0,failed:false};

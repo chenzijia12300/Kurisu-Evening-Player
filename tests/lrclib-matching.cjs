@@ -3,7 +3,7 @@ const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm');
 const root=path.resolve(__dirname,'..');
 const context={console,URL,AbortController,DOMException};context.window=context;
 vm.createContext(context);
-for(const file of ['utils/track','utils/chinese','services/lyrics/lrcParser','services/lyrics/LyricsProvider','services/lyrics/LrclibProvider']){
+for(const file of ['utils/track','utils/chinese','utils/lyricsMatch','services/lyrics/lrcParser','services/lyrics/LyricsProvider','services/lyrics/LrclibProvider']){
   vm.runInContext(fs.readFileSync(path.join(root,'src',file+'.js'),'utf8'),context);
 }
 const N=context.NowPlaying;

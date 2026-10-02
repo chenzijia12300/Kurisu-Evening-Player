@@ -3,7 +3,7 @@
   N.MediaEnrichment=class {
     constructor(provider,onChange,{online=true,lyricsProviders,artworkProviders,cache,retryDelays=[3000,10000,30000],debounce=400}={}){
       this.provider=provider;this.onChange=onChange;this.online=online;this.lyricsEnabled=true;this.artworkEnabled=true;
-      this.lyricsProviders=lyricsProviders||[new N.KugouLyricsProvider(),new N.AmllLyricsProvider(),new N.LrclibProvider()];this.artworkProviders=artworkProviders||[new N.MusicBrainzArtworkProvider()];this.cache=cache||new N.MediaCache();
+      this.lyricsProviders=lyricsProviders||[new N.AmllLyricsProvider(),new N.KugouLyricsProvider(),new N.LrclibProvider()];this.artworkProviders=artworkProviders||[new N.MusicBrainzArtworkProvider()];this.cache=cache||new N.MediaCache();
       this.jobs={};this.retryDelays=retryDelays;this.debounce=debounce;this.previous=null;
       this.unsubscribe=provider.subscribe(()=>this.update());
       this.reconnect=()=>{for(const [kind,job] of Object.entries(this.jobs))if(job.failed)this.cancel(kind);this.update();};
@@ -26,7 +26,7 @@
         }
         // Album/duration refinement is a new query, not a new song. Keep usable results visible.
         const bridge=kind==='lyrics'&&typeof N.bridgeReady==='function'&&N.bridgeReady()?1:0;
-        const key=(kind==='lyrics'?'lyrics-v4:':'stable-v2:')+kind+':'+N.trackKey(track)+':'+Math.round(track.duration||0)+':'+bridge;
+        const key=(kind==='lyrics'?'lyrics-v5:':'stable-v2:')+kind+':'+N.trackKey(track)+':'+Math.round(track.duration||0)+':'+bridge;
         if(this.jobs[kind]?.key===key)continue;
         this.cancel(kind);
         const job=this.jobs[kind]={key,control:new AbortController(),attempt:0,failed:false};
@@ -48,19 +48,29 @@
               const found=await provider.find(track,signal);
               if(!current())return;
               if(!this.valid(kind,found))continue;
+              if(kind==='lyrics'&&found.retryTranslation)failed=true;
               const rank=kind==='lyrics'&&found.lines.some(line=>String(line.translation||'').trim())?2:1;
-              if(!best||rank>best.rank)best={result:found,rank};
+              if(!best||rank>best.rank){
+                best={result:found,rank};
+                if(kind==='lyrics'&&!s.lyrics?.lines.some(line=>line.translation?.trim())){s.lyrics=found;this.onChange();}
+              }
               if(rank===2||kind!=='lyrics')break;
             }catch(error){if(!current())return;failed=true;N.log(kind,'unavailable',error.message);}
           }
           result=best?best.result:null;
           if(!current())return;
           // One failed source + another source's empty result is not proof that no lyrics exist.
-          if(result||!failed)this.cache.set(job.key,result,result?(kind==='lyrics'?30:7)*DAY:5*60000);
+          const hasTranslation=kind==='lyrics'&&result?.lines.some(line=>line.translation?.trim());
+          if(!failed||hasTranslation||kind!=='lyrics'&&result)this.cache.set(job.key,result,result?(kind==='lyrics'?(hasTranslation?30:1):7)*DAY:5*60000);
         }
         if(!current())return;
-        job.failed=failed&&!result;
-        if(result){if(kind==='lyrics')s.lyrics=result;else s.hdCover=result.url;this.onChange();}
+        job.failed=failed&&(!result||kind==='lyrics'&&!result.lines.some(line=>line.translation?.trim()));
+        if(result){
+          if(kind==='lyrics'){
+            if(!s.lyrics?.lines.some(line=>line.translation?.trim())||result.lines.some(line=>line.translation?.trim()))s.lyrics=result;
+          }else s.hdCover=result.url;
+          this.onChange();
+        }
         // Failed/empty refinements keep the result already shown for this song.
         if(job.failed&&job.attempt<this.retryDelays.length){job.timer=setTimeout(()=>this.run(kind,track,job),this.retryDelays[job.attempt++]);}
       }catch(error){if(current())N.log(kind,'cache/provider error',error.message);}

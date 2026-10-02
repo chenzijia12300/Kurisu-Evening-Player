@@ -14,8 +14,39 @@
       }
       return best;
     }
-    async find(track,signal){
-      if(!track.title||!track.artist)return null;
+    async inferArtist(track,signal){
+      const {compact}=N.lyricsMatch,wanted=titleInfo(track.title);
+      // A short title without a singer is too ambiguous. Never guess for songs such as 花.
+      if(compact(wanted.base).length<4)return '';
+      for(const title of unique([track.title,wanted.base]).slice(0,2)){
+        const matches=[];let complete=true;
+        for(let page=1;page<=2;page++){
+          abort(signal);
+          const url=new URL('https://api.amll.dev/v1/lyrics/search');
+          url.searchParams.set('musicName',title);url.searchParams.set('pageSize','100');url.searchParams.set('page',String(page));
+          const response=await N.requestJSON(url.href,signal,'amll');abort(signal);
+          if(response&&!Array.isArray(response.data?.items))throw Error('AMLL invalid search response');
+          for(const item of (response?.data?.items||[]).slice(0,100)){
+            const artist=strings(item.artistNames,12)[0];if(!artist)continue;
+            const exact=strings(item.musicNames,12).some(name=>compact(titleInfo(name).base)===compact(wanted.base));
+            const scored=exact&&this.score({...track,artist},item);
+            if(scored&&scored.score>=.90)matches.push(artist);
+          }
+          if(!response?.data?.pagination?.hasMore)break;
+          if(page===2)complete=false;
+        }
+        // All exact-title records must agree on the performer, including possible covers.
+        if(matches.length){const artists=unique(matches.map(compact));return complete&&artists.length===1?matches[0]:'';}
+      }
+      return '';
+    }
+    async find(track,signal,searchBudget=12){
+      if(!track.title)return null;
+      if(!track.artist){
+        const artist=await this.inferArtist(track,signal);if(!artist)return null;
+        const found=await this.find({...track,artist},signal,8);
+        return found?{...found,match:{...found.match,inferredArtist:true}}:null;
+      }
       const candidates=new Map(),requested=new Set(),fetched=new Set();
       let searchCount=0,detailCount=0,error=null,best=null;
       const translated=result=>!!result?.lines.some(line=>line.translation?.trim());
@@ -45,7 +76,7 @@
       };
       const query=async params=>{
         for(let page=1;page<=2;page++){
-          abort(signal);if(error||searchCount>=12||candidates.size>=500)return null;
+          abort(signal);if(error||searchCount>=searchBudget||candidates.size>=500)return null;
           const url=new URL('https://api.amll.dev/v1/lyrics/search');
           for(const [key,value] of Object.entries(params))if(value)url.searchParams.set(key,value);
           url.searchParams.set('pageSize','100');url.searchParams.set('page',String(page));

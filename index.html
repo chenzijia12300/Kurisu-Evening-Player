@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="color-scheme" content="dark">
   <title>暮色共听 · 牧濑红莉栖</title>
-  <link rel="stylesheet" href="style.css?v=21">
+  <link rel="stylesheet" href="style.css?v=23">
 </head>
 <body>
   <div class="scene-depth" aria-hidden="true">
@@ -19,6 +19,7 @@
       <div class="artwork"><img id="cover" src="assets/kurisu-resting.png" alt="歌曲封面占位图"><img id="cover-hd" class="album" alt="高清专辑封面" referrerpolicy="no-referrer"><div class="art-shade"></div><span class="art-caption" id="art-caption">此刻，与你共听</span></div>
       <div class="track"><h1 id="title">等一首歌</h1><p id="artist">播放音乐，让黄昏有声音</p><p id="album" hidden></p></div>
       <section id="lyrics" aria-label="歌词" hidden><p id="lyric-current"><span class="lyric-main"></span><span class="lyric-sub"></span></p><p id="lyric-next"></p><small id="lyric-source"></small></section>
+      <p id="lyric-status" role="status" hidden></p>
       <div class="timeline"><div id="progress" role="progressbar" aria-label="歌曲进度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="progress-fill"></i></div><div class="times"><span id="elapsed">--:--</span><span id="duration">--:--</span></div></div>
       <div class="controls">
         <button id="volume-down" class="small" aria-label="降低系统音量" title="降低系统音量" disabled><svg viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4V5Z"/><path class="line" d="M16 12h5"/></svg></button>
@@ -44,23 +45,23 @@
   <div id="toast" role="status" hidden></div>
   <script src="media-state.js?v=18"></script>
   <script src="src/utils/chinese.js?v=18"></script>
-  <script src="src/utils/track.js?v=18"></script>
-  <script src="src/utils/lyricsMatch.js?v=22"></script>
-  <script src="src/media/MediaState.js?v=18"></script>
-  <script src="src/media/WallpaperMediaProvider.js?v=18"></script>
+  <script src="src/utils/track.js?v=23"></script>
+  <script src="src/utils/lyricsMatch.js?v=23"></script>
+  <script src="src/media/MediaState.js?v=23"></script>
+  <script src="src/media/WallpaperMediaProvider.js?v=23"></script>
   <script src="src/utils/network.js?v=18"></script>
   <script src="src/services/MediaCache.js?v=18"></script>
   <script src="src/services/lyrics/lrcParser.js?v=18"></script>
   <script src="src/services/lyrics/ttmlParser.js?v=22"></script>
   <script src="src/services/lyrics/LyricsProvider.js?v=18"></script>
   <script src="src/services/lyrics/LrclibProvider.js?v=22"></script>
-  <script src="src/services/lyrics/KugouLyricsProvider.js?v=18"></script>
-  <script src="src/services/lyrics/AmllLyricsProvider.js?v=22"></script>
+  <script src="src/services/lyrics/KugouLyricsProvider.js?v=23"></script>
+  <script src="src/services/lyrics/AmllLyricsProvider.js?v=23"></script>
   <script src="src/services/artwork/ArtworkProvider.js?v=18"></script>
   <script src="src/services/artwork/MusicBrainzArtworkProvider.js?v=18"></script>
-  <script src="src/media/MediaEnrichment.js?v=22"></script>
-  <script src="src/components/NowPlaying/NowPlaying.js?v=18"></script>
+  <script src="src/media/MediaEnrichment.js?v=23"></script>
+  <script src="src/components/NowPlaying/NowPlaying.js?v=23"></script>
   <script src="hair-motion.js?v=18"></script>
-  <script src="wallpaper.js?v=18"></script>
+  <script src="wallpaper.js?v=23"></script>
 </body>
 </html>

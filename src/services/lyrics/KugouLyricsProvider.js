@@ -16,15 +16,18 @@
   N.KugouLyricsProvider=class extends N.LyricsProvider {
     async find(track,signal){
       if(!track.title||!track.artist)return null;
-      let packet=null;
-      try{packet=await this.direct(track,signal);}catch(error){if(signal.aborted)throw error;}
-      if(!packet?.lyric&&typeof N.bridgeLyrics==='function'){
-        try{packet=await N.bridgeLyrics(track,signal);}catch(error){if(signal.aborted)throw error;}
+      let packet=null,failure=null,bridged=false;
+      if(typeof N.bridgeLyrics==='function'&&N.bridgeReady?.()){
+        bridged=true;try{packet=await N.bridgeLyrics(track,signal);}catch(error){if(signal.aborted)throw error;failure=error;}
       }
-      if(!packet?.lyric)return null;
+      if(!packet?.lyric){try{packet=await this.direct(track,signal);}catch(error){if(signal.aborted)throw error;failure=error;}}
+      if(!packet?.lyric&&!bridged&&typeof N.bridgeLyrics==='function'){
+        try{packet=await N.bridgeLyrics(track,signal);}catch(error){if(signal.aborted)throw error;failure=error;}
+      }
+      if(!packet?.lyric){if(failure)throw failure;return null;}
       const row={title:packet.title||track.title,artist:packet.artist||track.artist,album:packet.album||'',duration:Number(packet.duration)||0};
-      const score=Math.max(N.matchScore(track,row),N.matchScore({...track,duration:0},{...row,duration:0}));
-      if(score<.82)return null;
+      const score=N.lyricsMatch.score(track,row)?.score||0;
+      if(score<.86)return null;
       packet.score=score;
       return N.packLyrics(packet,'酷狗音乐');
     }
@@ -33,7 +36,7 @@
       search.searchParams.set('format','json');search.searchParams.set('keyword',track.title+' '+track.artist);search.searchParams.set('page','1');search.searchParams.set('pagesize','20');
       const data=await N.requestJSON(search.href,signal,'kugou');
       const rows=(data?.data?.info||[]).map(row=>({raw:row,title:row.songname||'',artist:row.singername||'',album:row.album_name||'',duration:Number(row.duration)||0}));
-      const ranked=rows.map(row=>({row,score:N.matchScore(track,row)})).filter(x=>x.score>=.82).sort((a,b)=>b.score-a.score);
+      const ranked=rows.map(row=>({row,score:N.lyricsMatch.score(track,row)?.score||0})).filter(x=>x.score>=.86).sort((a,b)=>b.score-a.score);
       const best=ranked[0];if(!best?.row.raw.hash)return null;
       const lyricSearch=new URL('https://lyrics.kugou.com/search');
       lyricSearch.searchParams.set('ver','1');lyricSearch.searchParams.set('man','yes');lyricSearch.searchParams.set('client','pc');

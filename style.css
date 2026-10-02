@@ -21,6 +21,7 @@ dialog ol{padding-left:20px;font-size:13px;line-height:1.9;color:#eedcd6}dialog 
 .track #album{font-size:10px;margin-top:6px;color:#d9c6cd75}
 .track:has(+ #lyrics:not([hidden])){margin-bottom:8px}
 #lyrics{margin:0 0 14px;min-width:0}
+#lyric-status{margin:0 0 12px;font-size:12px;line-height:1.5;color:#f4d9cd99;min-width:0}
 #lyrics p{margin:0;min-width:0}
 #lyric-current{font-size:clamp(14px,.98vw,18px);font-weight:500;letter-spacing:.04em;line-height:1.45;color:#fff6ef}
 #lyric-current .lyric-main{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}

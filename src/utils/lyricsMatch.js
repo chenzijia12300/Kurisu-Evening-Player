@@ -73,4 +73,10 @@
       return {row,score,gap,sharedCredits:shared};
   };
   N.lyricsMatch={unique,compact,splitArtists,titleInfo,score};
+  N.lyricsHaveTranslation=result=>!!result?.lines?.some(line=>{
+    if(String(line.translation||'').trim())return true;
+    const rows=String(line.text||'').split('\n').map(x=>x.trim()).filter(Boolean);
+    // Some LRC sources place the Chinese translation at the same timestamp as the original.
+    return rows.length>1&&/[\u3040-\u30ffA-Za-z]/.test(rows[0])&&rows.slice(1).some(x=>/[\u3400-\u9fff]/.test(x)&&!/[\u3040-\u30ff]/.test(x));
+  });
 })();

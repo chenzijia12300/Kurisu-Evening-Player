@@ -53,6 +53,12 @@
       this.root.querySelector('.timeline').classList.toggle('is-stale',stale);
       this.root.querySelector('.timeline').title=stale?'时间读取暂时中断，保留最近位置，等待重新同步':s.timelineSource==='kugou-window'?'同步酷狗界面时间':s.hasTimeline?'同步系统媒体时间':'没有可靠播放位置时不自动滚动歌词；酷狗可通过可选本机控制器补充时间。';
       const lyrics=s.lyrics;this.songTitle=s.title;this.songArtist=s.artist;
+      const status=this.$('lyric-status');
+      if(status){
+        const messages={loading:'正在查找歌词…',unavailable:'歌词服务暂时不可用，稍后重试', 'missing-artist':'缺少歌手信息，暂无法确认歌词','not-found':'暂未找到匹配歌词'};
+        const message=this.showLyrics&&s.title&&!lyrics?messages[s.lyricsStatus]||'':'';
+        if(status.textContent!==message)status.textContent=message;status.hidden=!message;
+      }
       if(this.lyricsData!==lyrics){this.lyricsData=lyrics;this.lastLyric='';}
       const lines=lyrics&&Array.isArray(lyrics.lines)?lyrics.lines:[];
       const synced=!!(lyrics&&lyrics.kind==='synced'&&s.hasTimeline&&lines.length>1);

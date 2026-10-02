@@ -1,7 +1,7 @@
 (() => {
   const N=window.NowPlaying;
   N.MediaState=class extends window.MediaState.TrackState {
-    clear(){super.clear();this.albumArtist='';this.fallbackCover='';this.hdCover='';this.lyrics=null;this.currentLyricIndex=-1;this.contentType='music';this.staleCover='';this.timelinePending=false;}
+    clear(){super.clear();this.albumArtist='';this.fallbackCover='';this.hdCover='';this.lyrics=null;this.lyricsStatus='';this.currentLyricIndex=-1;this.contentType='music';this.staleCover='';this.timelinePending=false;}
     resetTimeline(){super.resetTimeline();this.timelinePending=false;}
     setProperties(e){
       const title=typeof e.title==='string'?e.title:'',sameTitle=!!title&&title===this.title;

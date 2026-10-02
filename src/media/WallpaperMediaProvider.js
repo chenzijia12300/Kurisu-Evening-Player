@@ -5,6 +5,10 @@
     subscribe(fn){this.listeners.add(fn);return ()=>this.listeners.delete(fn);}
     notify(kind='change'){N.log(kind,{title:this.state.title,playback:this.state.playback,position:this.state.position,duration:this.state.duration});for(const fn of this.listeners)fn(this.state,kind);}
     setTimeline(e,now=performance.now(),source='native'){const before=this.state.hasTimeline;this.state.setTimeline(e,now,source);if(this.state.hasTimeline||before)this.notify('timeline');}
+    refineArtist(title,artist){
+      const s=this.state;if(!s.enabled||s.title!==title||s.artist||!artist)return false;
+      s.setProperties({title:s.title,artist,albumTitle:s.album,albumArtist:s.albumArtist,contentType:s.contentType});this.notify('metadata');return true;
+    }
     start(){
       if(this.started)return;this.started=true;
       const s=this.state,register=(name,fn)=>{if(typeof window[name]==='function')window[name](fn);};
